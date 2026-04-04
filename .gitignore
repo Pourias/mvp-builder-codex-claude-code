@@ -2,3 +2,6 @@
 __pycache__/
 *.py[cod]
 .mvp-builder/
+.venv/
+.pytest_cache/
+.firecrawl/

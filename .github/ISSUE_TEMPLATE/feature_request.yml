@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest an improvement to the MVP Builder workflow or user experience
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please explain the problem and why the change would help.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the pain point or limitation first.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What change would you like?
+      description: Describe the behavior you want to see.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why is this a good fit for MVP Builder?
+      description: Explain how it supports the project's goal of small, autonomous MVP delivery.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Share workarounds or other options you considered.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked existing issues first
+          required: true

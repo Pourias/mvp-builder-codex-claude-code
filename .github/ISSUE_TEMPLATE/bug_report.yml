@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a problem with the runner, prompts, workflow, or documentation
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please be as specific as you can so the issue is reproducible.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly and directly.
+      placeholder: The run reached STAGE_VERIFY and then failed to advance...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the prompt, commands, state, and any relevant artifact paths.
+      placeholder: |
+        1. Install the skill into ~/.codex/skills/mvp-builder
+        2. Run...
+        3. Open...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Share anything relevant about your setup.
+      placeholder: |
+        OS:
+        Python version:
+        Codex app or CLI:
+        Run state:
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots, or artifacts
+      description: Paste the useful parts here or link to them.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked existing issues first
+          required: true
+        - label: I included enough detail to reproduce the problem
+          required: true
