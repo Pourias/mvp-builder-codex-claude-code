@@ -1,0 +1,4 @@
+interface:
+  display_name: "MVP Builder"
+  short_description: "Autonomous MVP build workflow"
+  default_prompt: "Use $mvp-builder to turn this product idea into a small, shipped MVP with minimal human involvement."
