@@ -63,6 +63,31 @@ This skill is designed to make Codex act more like an autonomous MVP builder:
 
 The state machine includes these core states:
 
+```mermaid
+flowchart TD
+    A["BOOTSTRAP_CODEX"] --> B["REQUEST_CONTRACT"]
+    B -->|auto_proceed| C["RESEARCH_ARCHITECTURE"]
+    B -->|human_review_required| B
+    C --> D["IMPLEMENT_SCAFFOLD"]
+    D --> E["ENUMERATE_STAGES"]
+    E --> F["STAGE_BRAINSTORM"]
+    F --> G["STAGE_RESEARCH"]
+    G --> H["STAGE_IMPLEMENT"]
+    H --> I["STAGE_VERIFY"]
+    I -->|next stage| F
+    I -->|all stages complete| J["FINAL_VERIFY"]
+    J --> K["FINAL_REPORT"]
+    K --> L["COMPLETED"]
+    B --> M["FAILED"]
+    C --> M
+    D --> M
+    F --> M
+    G --> M
+    H --> M
+    I --> M
+    J --> M
+```
+
 - `BOOTSTRAP_CODEX`
 - `REQUEST_CONTRACT`
 - `RESEARCH_ARCHITECTURE`
