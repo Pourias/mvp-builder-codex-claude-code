@@ -2,7 +2,7 @@
 
 Thanks for helping improve `mvp-builder`.
 
-This project is trying to make Codex more autonomous at getting from a vague product request to a believable MVP, while staying small, durable, and understandable. Contributions are most helpful when they improve that core mission without adding unnecessary complexity.
+This project is trying to make coding agents more autonomous at getting from a vague product request to a believable MVP, while staying small, durable, and understandable. Contributions are most helpful when they improve that core mission without adding unnecessary complexity.
 
 ## Good Contribution Areas
 
@@ -34,8 +34,9 @@ This project is trying to make Codex more autonomous at getting from a vague pro
 Important files:
 
 - [SKILL.md](SKILL.md)
-- [scripts/mvp_builder.py](scripts/mvp_builder.py)
-- [prompts/](prompts)
+- [core/scripts/mvp_builder.py](core/scripts/mvp_builder.py)
+- [core/prompts/](core/prompts)
+- [adapters/claude-code/](adapters/claude-code)
 - [agents/openai.yaml](agents/openai.yaml)
 
 Try to keep user-facing docs in `README.md` and agent-facing operational guidance in `SKILL.md`.
@@ -45,7 +46,7 @@ Try to keep user-facing docs in `README.md` and agent-facing operational guidanc
 Minimum local check:
 
 ```bash
-python3 -m py_compile scripts/mvp_builder.py
+python3 -m py_compile core/scripts/mvp_builder.py
 ```
 
 Optional validator if you have the bundled Codex system skill available:

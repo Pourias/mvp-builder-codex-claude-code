@@ -1,6 +1,6 @@
 ---
 name: mvp-builder
-description: "Build a first-pass MVP through a disk-backed state machine with request contract, architecture research, staged implementation, verification, and final handoff. Use when Codex should take a product idea, app idea, internal tool request, workflow concept, prototype request, or early feature spec and autonomously turn it into a small shipped first version with minimal human involvement. This skill is self-contained: no OpenClaw services, no brokered research, and no dependency on other skills or agents. Use Codex built-in web search directly when a research stage needs outside information."
+description: "Build a first-pass MVP through a disk-backed state machine with request contract, architecture research, staged implementation, verification, and final handoff. Use when Codex should take a product idea, app idea, internal tool request, workflow concept, prototype request, or early feature spec and autonomously turn it into a small shipped first version with minimal human involvement. This Codex adapter uses the shared mvp-builder core, which also supports Claude Code. Use native web research directly when a research stage needs outside information."
 ---
 
 # MVP Builder
@@ -9,6 +9,8 @@ description: "Build a first-pass MVP through a disk-backed state machine with re
 
 Use this skill when the user wants a real builder workflow, not just a one-off implementation pass. The skill creates a visible run folder on disk, advances through explicit states, preserves durable artifacts, and keeps pushing toward a working MVP unless there is a genuine reason to stop.
 
+This file is the Codex adapter for the shared `mvp-builder` core. The shared runner lives at `core/scripts/mvp_builder.py`.
+
 ## Workflow
 
 Drive the runner directly from Codex. The human should not need to manually manage the state machine in normal use.
@@ -16,14 +18,16 @@ Drive the runner directly from Codex. The human should not need to manually mana
 1. Initialize a run:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py init \
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py init \
+  --host codex \
+  --calling-agent codex \
   --raw-input "build a simple internal dashboard for tracking invoices"
 ```
 
 2. Render the current prompt:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py render-prompt --run <run-dir>
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py render-prompt --run <run-dir>
 ```
 
 3. Do the work for that state inside Codex.
@@ -31,7 +35,7 @@ python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py render-prompt --run <
 4. Apply the structured reply back into the run:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py apply-reply \
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py apply-reply \
   --run <run-dir> \
   --reply-file /absolute/path/to/reply.md
 ```
@@ -46,7 +50,7 @@ Read these files between steps:
 
 ## States
 
-- `BOOTSTRAP_CODEX`
+- `BOOTSTRAP_AGENT`
 - `REQUEST_CONTRACT`
 - `RESEARCH_ARCHITECTURE`
 - `IMPLEMENT_SCAFFOLD`
@@ -82,11 +86,11 @@ This skill does not use researcher agents, queues, or external orchestration ser
 
 When a research state needs outside information:
 
-- use Codex built-in web search directly
+- use native web research directly
 - keep the research proportional to the MVP
 - write the conclusions into the reply artifact for that state
 - include short source notes in the `Research evidence` section
-- do not invent citations if web search was not actually used
+- do not invent citations if web research was not actually used
 
 When a stage is straightforward, explicitly say web search was not needed and proceed.
 
@@ -112,7 +116,7 @@ Each run writes visible files on disk:
 
 - `run_spec.json`
 - `state.json`
-- `codex_session.json`
+- `agent_session.json`
 - `events.jsonl`
 - `status.md`
 - `latest_update.md`
@@ -138,20 +142,21 @@ If something could not be tested, say exactly why.
 
 ## Commands
 
-The runner lives at:
+The shared runner lives at:
 
-- `~/.codex/skills/mvp-builder/scripts/mvp_builder.py`
+- `~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py`
 
 Useful commands:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py status --run <run-dir>
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py render-prompt --run <run-dir>
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py apply-human-feedback --run <run-dir> --decision approve
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py apply-human-feedback --run <run-dir> --decision change --feedback "Tighten the scope."
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py status --run <run-dir>
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py render-prompt --run <run-dir>
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py apply-human-feedback --run <run-dir> --decision approve
+python3 ~/.codex/skills/mvp-builder/core/scripts/mvp_builder.py apply-human-feedback --run <run-dir> --decision change --feedback "Tighten the scope."
 ```
 
 ## Resources
 
-- `scripts/mvp_builder.py`: the state-machine runner
-- `prompts/`: state prompt templates and follow-up prompts
+- `core/scripts/mvp_builder.py`: the shared state-machine runner
+- `core/prompts/`: shared prompt templates and follow-up prompts
+- `adapters/claude-code/`: Claude Code installer and templates

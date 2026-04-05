@@ -11,7 +11,7 @@ Your job in this stage is to research and plan the project. Do not build anythin
 What to do:
 
 1. Decide whether web search is actually needed for this request.
-2. If needed, use Codex built-in web search directly for similar implementations, patterns, and best practices.
+2. If needed, use the active host's native web research directly for similar implementations, patterns, and best practices.
 3. Propose the simplest practical architecture that satisfies the request.
 4. Give the project a short working name.
 5. Break the work into an ordered list of implementation stages.

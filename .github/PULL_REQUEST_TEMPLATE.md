@@ -16,5 +16,5 @@
 
 - [ ] I kept the change focused and scoped
 - [ ] I updated docs or prompts if behavior changed
-- [ ] I ran `python3 -m py_compile scripts/mvp_builder.py`
+- [ ] I ran `python3 -m py_compile core/scripts/mvp_builder.py`
 - [ ] I added follow-up notes if something is intentionally incomplete

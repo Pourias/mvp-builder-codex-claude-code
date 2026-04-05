@@ -41,7 +41,7 @@ body:
       placeholder: |
         OS:
         Python version:
-        Codex app or CLI:
+        Host: Codex or Claude Code
         Run state:
     validations:
       required: true

@@ -5,7 +5,7 @@ Stage position:
 
 Your job in this stage is to research the strongest practical approach for this specific stage.
 
-Use Codex built-in web search only if it is actually useful for this stage. If this stage is straightforward and can be implemented from the local codebase plus the stage brief, say so directly and skip web search.
+Use native host web research only if it is actually useful for this stage. If this stage is straightforward and can be implemented from the local codebase plus the stage brief, say so directly and skip web search.
 
 Learn:
 

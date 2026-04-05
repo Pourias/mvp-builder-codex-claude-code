@@ -1,71 +1,41 @@
-# MVP Builder
+# MVP Builder for Codex + Claude Code
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-I built `mvp-builder` because I wanted Codex to do more of the real product work for me and push projects all the way to an MVP state with much less human involvement.
+`mvp-builder` is a disk-backed MVP workflow that helps coding agents push a vague product request toward a believable first version with less human steering.
 
-Instead of treating each request like a one-off coding task, `mvp-builder` uses a disk-backed state machine that moves through a full build workflow: request contract, architecture, scaffold, staged implementation, verification, and final handoff. When research is needed, Codex uses its own built-in web search inside the workflow so it can gather the context it needs before making implementation decisions.
+Instead of treating each request like a one-off implementation task, it moves through an explicit state machine with request contract, architecture research, scaffold, stage planning, stage research, implementation, verification, and final handoff. The workflow stays resumable because each run writes durable artifacts to disk.
 
-The goal is simple: save time, reduce context drift, and help Codex ship stronger first iterations of products instead of stopping at vague plans or half-finished prototypes.
+This repository now supports two host environments:
 
-`mvp-builder` is intentionally self-contained. It does not depend on OpenClaw services, brokered research, or other skills. The runner handles state and artifacts on disk, and Codex handles the actual research, coding, verification, and handoff.
-
-## Status
-
-`mvp-builder` is an early open-source release aimed at real-world MVP shipping, not academic demos. The current focus is:
-
-- strong first-pass product scaffolding
-- stateful autonomous execution with minimal human intervention
-- durable artifacts and resumable runs
-- practical research inside the workflow using Codex web search
-
-If you want to help improve it, see [CONTRIBUTING.md](CONTRIBUTING.md).
+- `Codex` via the root [SKILL.md](SKILL.md)
+- `Claude Code` via the installable adapter under [adapters/claude-code](adapters/claude-code)
 
 ## What It Does
 
-`mvp-builder` helps Codex:
+`mvp-builder` helps a host agent:
 
 - turn a product idea into a structured build workflow
-- create an approved request contract before building
+- lock an approved request contract before building
 - research architecture and stage-level decisions when useful
 - scaffold the project
 - break work into clear implementation stages
-- implement each stage with minimal human intervention
-- verify the work before handing it off
+- implement and verify each stage
 - produce a final report with what was built, what remains, and what to test next
 
-## Why This Exists
+## Repo Layout
 
-Most coding agents are good at one isolated implementation pass, but much weaker at managing the full path from vague request to believable MVP. I built this to close that gap.
+- [SKILL.md](SKILL.md): Codex adapter entrypoint
+- [core/scripts/mvp_builder.py](core/scripts/mvp_builder.py): shared workflow runner
+- [core/prompts](core/prompts): shared prompt templates
+- [adapters/claude-code](adapters/claude-code): Claude Code adapter templates and installer
+- [agents/openai.yaml](agents/openai.yaml): Codex skill metadata
 
-The core idea is simple:
-
-- give Codex a product request
-- move it through explicit states
-- let it research what it needs at the right moments
-- keep visible artifacts on disk
-- reduce how much the human needs to manually re-steer the process
-
-That should save a lot of time, especially on early product work where the most expensive part is usually coordination and lost context, not writing the code itself.
-
-## Why I Built It
-
-I wanted a way to hand Codex an idea and let it keep moving without repeatedly asking me to re-scope, re-explain, or manually coordinate each phase.
-
-This skill is designed to make Codex act more like an autonomous MVP builder:
-
-- it keeps durable state on disk
-- it preserves artifacts from each step
-- it keeps work moving toward a shipped first version
-- it only pauses when there is a real blocker or a genuinely high-risk decision
-
-## How It Works
-
-The state machine includes these core states:
+## State Machine
 
 ```mermaid
 flowchart TD
-    A["BOOTSTRAP_CODEX"] --> B["REQUEST_CONTRACT"]
+    A["BOOTSTRAP_AGENT"] --> B["REQUEST_CONTRACT"]
     B -->|auto_proceed| C["RESEARCH_ARCHITECTURE"]
     B -->|human_review_required| B
     C --> D["IMPLEMENT_SCAFFOLD"]
@@ -88,7 +58,9 @@ flowchart TD
     J --> M
 ```
 
-- `BOOTSTRAP_CODEX`
+Core states:
+
+- `BOOTSTRAP_AGENT`
 - `REQUEST_CONTRACT`
 - `RESEARCH_ARCHITECTURE`
 - `IMPLEMENT_SCAFFOLD`
@@ -104,18 +76,12 @@ Each run writes durable files like:
 
 - `run_spec.json`
 - `state.json`
+- `agent_session.json`
 - `events.jsonl`
 - `status.md`
 - `latest_update.md`
 - `human_progress.md`
 - artifacts under `artifacts/`
-
-The repository is split between:
-
-- [README.md](README.md): human-facing overview and setup
-- [SKILL.md](SKILL.md): the actual skill contract Codex reads
-- [scripts/mvp_builder.py](scripts/mvp_builder.py): the runner and state machine
-- [prompts/](prompts): prompt templates for each state
 
 ## Research
 
@@ -125,55 +91,70 @@ It does not depend on:
 
 - OpenClaw services
 - brokered research queues
-- researcher agents
-- other Codex skills
+- external researcher agents
 
-When research is needed, Codex uses its own built-in web search directly inside the workflow and writes the useful conclusions into the run artifacts.
+When research is needed, the active host should use its native web research capability and write the useful conclusions into the run artifacts.
 
-## Install
+## Install For Codex
 
-Clone or copy this folder into your Codex skills directory:
-
-```bash
-git clone https://github.com/Pourias/Codex-MVP-builder.git ~/.codex/skills/mvp-builder
-```
-
-Or, if you already have the folder locally:
+Clone the repo into your Codex skills directory under the skill name `mvp-builder`:
 
 ```bash
-mkdir -p ~/.codex/skills
-cp -R ./mvp-builder ~/.codex/skills/mvp-builder
+git clone https://github.com/Pourias/mvp-builder-codex-claude-code.git ~/.codex/skills/mvp-builder
 ```
 
-## Use In Codex
-
-Open a fresh Codex thread and say something like:
+Then open a fresh Codex thread and say something like:
 
 ```text
 Use $mvp-builder to build a tiny local CRM for one salesperson.
 ```
 
-If you want to drive the runner manually or debug a run, use the CLI commands below.
+## Install For Claude Code
 
-## Usage
+Clone the repo anywhere you want to keep shared tools:
+
+```bash
+git clone https://github.com/Pourias/mvp-builder-codex-claude-code.git ~/tools/mvp-builder
+```
+
+Then install the Claude Code adapter into the project you want to build:
+
+```bash
+python3 ~/tools/mvp-builder/core/scripts/install_claude_code_adapter.py \
+  --project /absolute/path/to/your/project
+```
+
+That installer will:
+
+- add or update an `MVP Builder` block inside the target project's `CLAUDE.md`
+- install `.claude/commands/mvp-builder.md` for the target project
+
+After that, open Claude Code in the target project and run:
+
+```text
+/mvp-builder Build a tiny local CRM for one salesperson.
+```
+
+## Manual Runner Usage
 
 Initialize a run:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py init \
+python3 core/scripts/mvp_builder.py init \
+  --host codex \
   --raw-input "Build a tiny local CRM for one salesperson"
 ```
 
 Render the current prompt:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py render-prompt --run <run-dir>
+python3 core/scripts/mvp_builder.py render-prompt --run <run-dir>
 ```
 
 Apply the reply for that state:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py apply-reply \
+python3 core/scripts/mvp_builder.py apply-reply \
   --run <run-dir> \
   --reply-file /absolute/path/to/reply.md
 ```
@@ -181,17 +162,17 @@ python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py apply-reply \
 Check status:
 
 ```bash
-python3 ~/.codex/skills/mvp-builder/scripts/mvp_builder.py status --run <run-dir>
+python3 core/scripts/mvp_builder.py status --run <run-dir>
 ```
 
 ## Validation
 
 The runner itself uses only the Python standard library.
 
-You can do a minimal local validation with:
+Minimal local validation:
 
 ```bash
-python3 -m py_compile ~/.codex/skills/mvp-builder/scripts/mvp_builder.py
+python3 -m py_compile core/scripts/mvp_builder.py
 ```
 
 If you want to use the bundled Codex skill validator, install `PyYAML` first:
@@ -210,11 +191,11 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 ## License
 
-This project is released under the MIT License. See `LICENSE`.
+This project is released under the MIT License. See [LICENSE](LICENSE).
 
 ## Best First Test
 
-The best way to test `mvp-builder` is in a fresh Codex thread with a small real MVP request, for example:
+The best way to test `mvp-builder` is with a small real MVP request, for example:
 
 - a tiny CRM notes app
 - a local habit tracker
