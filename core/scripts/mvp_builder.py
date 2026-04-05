@@ -618,8 +618,6 @@ def sync_agent_session(run_dir: Path, run_spec: dict) -> tuple[dict, bool]:
         "transport_mode": str(run_spec.get("transport_mode", "host-adapter")).strip() or "host-adapter",
         "binding_scope": "conversation_if_available",
         "session_id": conversation_id,
-        "openclaw_session_key": "",
-        "session_key_origin": "",
         "thread_id": conversation_id,
         "conversation_id": conversation_id,
         "project_id": "",
@@ -637,6 +635,11 @@ def sync_agent_session(run_dir: Path, run_spec: dict) -> tuple[dict, bool]:
     for key, value in desired.items():
         if agent_session.get(key) != value:
             agent_session[key] = value
+            changed = True
+
+    for legacy_key in ("openclaw_session_key", "session_key_origin"):
+        if legacy_key in agent_session:
+            agent_session.pop(legacy_key, None)
             changed = True
 
     if changed:
@@ -838,7 +841,6 @@ def render_status(run_spec: dict, state: dict, codex_session: dict) -> str:
         f"- host: {run_spec.get('host', '')}",
         f"- binding_scope: {codex_session.get('binding_scope', '')}",
         f"- agent_session_id: {codex_session.get('session_id', '')}",
-        f"- session_key_origin: {codex_session.get('session_key_origin', '')}",
         f"- agent_conversation_id: {codex_session.get('conversation_id', '') or codex_session.get('thread_id', '') or 'unmapped'}",
         f"- agent_session_status: {codex_session.get('status', '')}",
         f"- model: {codex_session.get('model', '')}",
@@ -2033,9 +2035,7 @@ def init_run(args: argparse.Namespace) -> int:
 
     workspace_path = str(Path(args.workspace_path).expanduser().resolve())
     effective_transport_mode = f"{host}-adapter"
-    openclaw_session_key = ""
     binding_scope = "conversation_if_available"
-    session_key_origin = ""
     transport_note = (
         "This run is self-contained inside the MVP Builder shared workflow. "
         "The active host may record the current conversation id when the environment exposes it, "
@@ -2059,8 +2059,6 @@ def init_run(args: argparse.Namespace) -> int:
         "requested_transport_mode": effective_transport_mode,
         "transport_mode_note": transport_note,
         "binding_scope": binding_scope,
-        "openclaw_session_key": openclaw_session_key,
-        "session_key_origin": session_key_origin,
         "required_agents": [],
         "required_skills": [],
         "required_tools": [],
@@ -2114,8 +2112,6 @@ def init_run(args: argparse.Namespace) -> int:
         "transport_mode": effective_transport_mode,
         "binding_scope": binding_scope,
         "session_id": "",
-        "openclaw_session_key": openclaw_session_key,
-        "session_key_origin": session_key_origin,
         "thread_id": "",
         "conversation_id": "",
         "project_id": "",
